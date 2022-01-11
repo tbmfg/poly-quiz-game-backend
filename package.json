@@ -23,6 +23,7 @@
     "socket.io": "^2.3.0"
   },
   "devDependencies": {
-    "express-swagger-generator": "^1.1.17"
+    "express-swagger-generator": "^1.1.17",
+    "nodemon": "^2.0.15"
   }
 }

@@ -12,9 +12,9 @@ const usersSchema = new mongoose.Schema({
     password: {
         type: String,
         required: false,
-    }
+    },
 });
 
-mongoose.model("Users", usersSchema);
+mongoose.model('Users', usersSchema);
 
 module.exports = usersSchema;
