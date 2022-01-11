@@ -2,20 +2,26 @@ const express = require('express');
 const authRouter = express.Router();
 require('querystring');
 const mongoose = require('mongoose');
-require('../../database/model/users');
 const db = mongoose.connection;
-const Users = mongoose.model('Users');
 const passport = require('passport');
 const LocalStrategy = require('passport-local').Strategy;
 const flash = require('connect-flash');
-const authenticationMiddleware = require('../../middleware/authenticationMiddleware');
 const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
+const JwtStrategy = require('passport-jwt').Strategy;
+const ExtractJwt = require('passport-jwt').ExtractJwt;
+
+// const authenticationMiddleware = require('../../middleware/authenticationMiddleware');
+require('../../database/model/users');
+
+const secret_key = 'TOP_SECRET';
+
+const Users = mongoose.model('Users');
 
 authRouter.use(passport.initialize());
 authRouter.use(passport.session());
 authRouter.use(flash());
 
-//Passport middleware for Authentication
 passport.use(
   new LocalStrategy(function (username, password, done) {
     Users.findOne({ username: username }, function (err, user) {
@@ -29,6 +35,26 @@ passport.use(
         return done(null, false, { message: 'password-incorrect' });
       }
       return done(null, user);
+    });
+  })
+);
+
+var opts = {};
+opts.jwtFromRequest = ExtractJwt.fromAuthHeaderAsBearerToken();
+opts.secretOrKey = secret_key;
+
+passport.use(
+  new JwtStrategy(opts, function (jwt_payload, done) {
+    Users.findOne({ username: jwt_payload.username }, function (err, user) {
+      if (err) {
+        return done(err, false);
+      }
+      if (user) {
+        return done(null, user);
+      } else {
+        return done(null, false);
+        // or you could create a new account
+      }
     });
   })
 );
@@ -65,15 +91,19 @@ authRouter.post('/login', function (req, res, next) {
     if (err) return next(err);
 
     if (!user) {
-      return res.status(401).json({ message: 'Username and/or password is incorrect.' });
+      return res
+        .status(401)
+        .json({ message: 'Username and/or password is incorrect.' });
     }
     req.logIn(user, function (err) {
       if (err) return next(err);
-
-      return res.json({
+      const body = {
         name: req.session.passport.user.name,
         username: req.session.passport.user.username,
-      });
+      };
+      const token = jwt.sign({ user: body }, secret_key);
+
+      return res.json({ token });
     });
   })(req, res, next);
 });
@@ -110,7 +140,10 @@ authRouter.post('/register', async (req, res) => {
 
   await Users.findOne({ username: username }, async function (err, user) {
     if (err) return res.json({ success: false, error: true });
-    if (user) return res.status(303).json({ success: false, message: 'Username already exist!' });
+    if (user)
+      return res
+        .status(303)
+        .json({ success: false, message: 'Username already exist!' });
 
     const salt = bcrypt.genSaltSync(10);
     const newUser = new Users({
@@ -161,40 +194,12 @@ authRouter.get('/username-availability', async (req, res) => {
   });
 });
 
-/**
- * @typedef ResponseAuthenticatedRouteJSON
- * @property {string} username - user's username - eg: janet
- * @property {string} message - message - eg: This is a authenticated route!
- */
-/**
- * Dashboard endpoint only allowed for authenticated users
- * @route GET /api/v1/auth/dashboard
- * @group Auth
- * @returns {ResponseAuthenticatedRouteJSON.model} 200
- * @produces application/json
- */
-authRouter.get('/dashboard', authenticationMiddleware(), (req, res) => {
-  return res.json({
-    username: req.session.passport.user.username,
-    message: 'This is a authenticated route!',
-  });
-});
-
-/**
- * @typedef ResponseSuccessLogoutJSON
- * @property {boolean} success
- */
-/**
- * @route GET /api/v1/auth/logout
- * @group Auth
- * @returns {ResponseSuccessLogoutJSON.model} 200 - Logout successfully
- * @produces application/json
- */
-authRouter.get('/logout', function (req, res) {
-  req.logout();
-  res.json({
-    success: true,
-  });
-});
+authRouter.get(
+  '/dashboard',
+  passport.authenticate('jwt', { session: false }),
+  (req, res) => {
+    return res.json(req.user);
+  }
+);
 
 module.exports = authRouter;
