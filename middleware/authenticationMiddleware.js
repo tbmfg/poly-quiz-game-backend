@@ -1,9 +1,11 @@
 function authenticationMiddleware() {
   return function (req, res, next) {
-    if (req.isAuthenticated()) {
-      return next();
-    }
-    res.redirect('api/v1');
+    console.log(222)
+    res.send({ msg: req.isAuthenticated() });
+    // if (req.isAuthenticated()) {
+    //   return next();
+    // }
+    // res.redirect('api/v1');
   };
 }
 

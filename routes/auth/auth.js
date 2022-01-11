@@ -2,13 +2,13 @@ const express = require('express');
 const authRouter = express.Router();
 require('querystring');
 const mongoose = require('mongoose');
-require('./../../../database/model/users');
+require('../../database/model/users');
 const db = mongoose.connection;
 const Users = mongoose.model('Users');
 const passport = require('passport');
 const LocalStrategy = require('passport-local').Strategy;
 const flash = require('connect-flash');
-const authenticationMiddleware = require('./../../../middleware/authenticationMiddleware');
+const authenticationMiddleware = require('../../middleware/authenticationMiddleware');
 const bcrypt = require('bcryptjs');
 
 authRouter.use(passport.initialize());
