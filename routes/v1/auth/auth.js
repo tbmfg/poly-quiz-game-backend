@@ -17,28 +17,28 @@ authRouter.use(flash());
 
 //Passport middleware for Authentication
 passport.use(
-    new LocalStrategy(function (username, password, done) {
-        Users.findOne({ username: username }, function (err, user) {
-            if (err) {
-                return done(err);
-            }
-            if (!user) {
-                return done(null, false, { message: 'username-incorrect' });
-            }
-            if (!bcrypt.compareSync(password, user.password)) {
-                return done(null, false, { message: 'password-incorrect' });
-            }
-            return done(null, user);
-        });
-    })
+  new LocalStrategy(function (username, password, done) {
+    Users.findOne({ username: username }, function (err, user) {
+      if (err) {
+        return done(err);
+      }
+      if (!user) {
+        return done(null, false, { message: 'username-incorrect' });
+      }
+      if (!bcrypt.compareSync(password, user.password)) {
+        return done(null, false, { message: 'password-incorrect' });
+      }
+      return done(null, user);
+    });
+  })
 );
 
 passport.serializeUser(function (user, done) {
-    done(null, user);
+  done(null, user);
 });
 
 passport.deserializeUser(function (user, done) {
-    done(null, user);
+  done(null, user);
 });
 
 /**
@@ -61,21 +61,21 @@ passport.deserializeUser(function (user, done) {
  * @consumes application/json
  */
 authRouter.post('/login', function (req, res, next) {
-    passport.authenticate('local', function (err, user, info) {
-        if (err) return next(err);
+  passport.authenticate('local', function (err, user, info) {
+    if (err) return next(err);
 
-        if (!user) {
-            return res.status(401).json({ message: 'Username and/or password is incorrect.' });
-        }
-        req.logIn(user, function (err) {
-            if (err) return next(err);
+    if (!user) {
+      return res.status(401).json({ message: 'Username and/or password is incorrect.' });
+    }
+    req.logIn(user, function (err) {
+      if (err) return next(err);
 
-            return res.json({
-                name: req.session.passport.user.name,
-                username: req.session.passport.user.username,
-            });
-        });
-    })(req, res, next);
+      return res.json({
+        name: req.session.passport.user.name,
+        username: req.session.passport.user.username,
+      });
+    });
+  })(req, res, next);
 });
 
 /**
@@ -100,34 +100,34 @@ authRouter.post('/login', function (req, res, next) {
  * @consumes application/json
  */
 authRouter.post('/register', async (req, res) => {
-    let { name, username, password } = req.body;
+  let { name, username, password } = req.body;
 
-    if (!name || !username || !password)
-        return res.status(409).json({
-            success: false,
-            message: 'All fields are required!',
-        });
-
-    await Users.findOne({ username: username }, async function (err, user) {
-        if (err) return res.json({ success: false, error: true });
-        if (user) return res.status(303).json({ success: false, message: 'Username already exist!' });
-
-        const salt = bcrypt.genSaltSync(10);
-        const newUser = new Users({
-            name: name,
-            username: username,
-            password: bcrypt.hashSync(password, salt),
-        });
-
-        await newUser.save(function (err) {
-            if (err) return console.error(err);
-        });
-
-        return res.status(201).json({
-            success: true,
-            message: 'User is successfully registered!',
-        });
+  if (!name || !username || !password)
+    return res.status(409).json({
+      success: false,
+      message: 'All fields are required!',
     });
+
+  await Users.findOne({ username: username }, async function (err, user) {
+    if (err) return res.json({ success: false, error: true });
+    if (user) return res.status(303).json({ success: false, message: 'Username already exist!' });
+
+    const salt = bcrypt.genSaltSync(10);
+    const newUser = new Users({
+      name: name,
+      username: username,
+      password: bcrypt.hashSync(password, salt),
+    });
+
+    await newUser.save(function (err) {
+      if (err) return console.error(err);
+    });
+
+    return res.status(201).json({
+      success: true,
+      message: 'User is successfully registered!',
+    });
+  });
 });
 
 /**
@@ -142,23 +142,23 @@ authRouter.post('/register', async (req, res) => {
  * @produces application/json
  */
 authRouter.get('/username-availability', async (req, res) => {
-    let username = req.query.username;
-    if (!username || username === '')
-        return res.json({
-            error: true,
-            message: "Username can't be empty!",
-        });
-
-    return Users.findOne({ username: username }, function (err, user) {
-        if (err)
-            return res.json({
-                error: true,
-            });
-
-        return res.json({
-            usernameAvailable: !user,
-        });
+  let username = req.query.username;
+  if (!username || username === '')
+    return res.json({
+      error: true,
+      message: "Username can't be empty!",
     });
+
+  return Users.findOne({ username: username }, function (err, user) {
+    if (err)
+      return res.json({
+        error: true,
+      });
+
+    return res.json({
+      usernameAvailable: !user,
+    });
+  });
 });
 
 /**
@@ -174,10 +174,10 @@ authRouter.get('/username-availability', async (req, res) => {
  * @produces application/json
  */
 authRouter.get('/dashboard', authenticationMiddleware(), (req, res) => {
-    return res.json({
-        username: req.session.passport.user.username,
-        message: 'This is a authenticated route!',
-    });
+  return res.json({
+    username: req.session.passport.user.username,
+    message: 'This is a authenticated route!',
+  });
 });
 
 /**
@@ -191,10 +191,10 @@ authRouter.get('/dashboard', authenticationMiddleware(), (req, res) => {
  * @produces application/json
  */
 authRouter.get('/logout', function (req, res) {
-    req.logout();
-    res.json({
-        success: true,
-    });
+  req.logout();
+  res.json({
+    success: true,
+  });
 });
 
 module.exports = authRouter;

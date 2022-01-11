@@ -19,21 +19,21 @@ let httpServer;
  * Configure middleware
  */
 app.use(
-    cors({
-        // origin: `http://localhost:${srvConfig.SERVER_PORT}`,
-        origin: function (origin, callback) {
-            return callback(null, true);
-        },
-        optionsSuccessStatus: 200,
-        credentials: true,
-    }),
-    session({
-        saveUninitialized: true,
-        secret: srvConfig.SESSION_SECRET,
-        resave: true,
-    }),
-    cookieParser(),
-    bodyParser.json()
+  cors({
+    // origin: `http://localhost:${srvConfig.SERVER_PORT}`,
+    origin: function (origin, callback) {
+      return callback(null, true);
+    },
+    optionsSuccessStatus: 200,
+    credentials: true,
+  }),
+  session({
+    saveUninitialized: true,
+    secret: srvConfig.SESSION_SECRET,
+    resave: true,
+  }),
+  cookieParser(),
+  bodyParser.json()
 );
 
 /**
@@ -50,31 +50,31 @@ if (srvConfig.SWAGGER_SETTINGS.enableSwaggerUI) expressSwagger(srvConfig.SWAGGER
  * Configure http(s)Server
  */
 if (srvConfig.HTTPS_ENABLED) {
-    const privateKey = fs.readFileSync(srvConfig.PRIVATE_KEY_PATH, 'utf8');
-    const certificate = fs.readFileSync(srvConfig.CERTIFICATE_PATH, 'utf8');
-    const ca = fs.readFileSync(srvConfig.CA_PATH, 'utf8');
+  const privateKey = fs.readFileSync(srvConfig.PRIVATE_KEY_PATH, 'utf8');
+  const certificate = fs.readFileSync(srvConfig.CERTIFICATE_PATH, 'utf8');
+  const ca = fs.readFileSync(srvConfig.CA_PATH, 'utf8');
 
-    // Create a HTTPS server
-    httpServer = https.createServer({ key: privateKey, cert: certificate, ca: ca }, app);
+  // Create a HTTPS server
+  httpServer = https.createServer({ key: privateKey, cert: certificate, ca: ca }, app);
 } else {
-    // Create a HTTP server
-    httpServer = http.createServer({}, app);
+  // Create a HTTP server
+  httpServer = http.createServer({}, app);
 }
 
 /**
  * Start http server & connect to MongoDB
  */
 httpServer.listen(srvConfig.SERVER_PORT, () => {
-    mongoose.connect(
-        `${CONNECTION_TYPE}://${dbAuthString}${DB_HOST}:${DB_PORT}/${DB_NAME}${DB_QUERY_PARAMS}`,
-        {
-            useNewUrlParser: true,
-            useUnifiedTopology: true,
-        },
-        () => {
-            console.log(`Server started on port ${srvConfig.SERVER_PORT}`);
-        }
-    );
+  mongoose.connect(
+    `${CONNECTION_TYPE}://${dbAuthString}${DB_HOST}:${DB_PORT}/${DB_NAME}${DB_QUERY_PARAMS}`,
+    {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+    },
+    () => {
+      console.log(`Server started on port ${srvConfig.SERVER_PORT}`);
+    }
+  );
 });
 
 /**
@@ -82,7 +82,7 @@ httpServer.listen(srvConfig.SERVER_PORT, () => {
  */
 const io = require('socket.io')(httpServer);
 io.on('connection', function (socket) {
-    console.log(`New connection: ${socket.id}`);
+  console.log(`New connection: ${socket.id}`);
 
-    socket.on('disconnect', () => console.log(`Connection left (${socket.id})`));
+  socket.on('disconnect', () => console.log(`Connection left (${socket.id})`));
 });

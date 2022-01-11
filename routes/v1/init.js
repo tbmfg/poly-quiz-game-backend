@@ -4,10 +4,10 @@ const path = require('path');
 const authRoute = require('./auth/auth');
 
 init.get('/', async function (req, res, next) {
-    res.json({
-        version: 1.0,
-        name: 'Express.js & Socket.io API boilerplate',
-    });
+  res.json({
+    version: 1.0,
+    name: 'Express.js & Socket.io API boilerplate',
+  });
 });
 
 /**

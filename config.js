@@ -50,34 +50,34 @@ const CA_PATH = '/opt/psa/var/modules/letsencrypt/etc/live/YOUR-DOMAIN-NAME.com/
  * Example: http://localhost:3005/api-docs/
  */
 const SWAGGER_SETTINGS = {
-    enableSwaggerUI: true,
-    swaggerDefinition: {
-        info: {
-            title: 'Express.js & Socket.io server',
-            description: 'Express.js endpoint API documentation.',
-            version: '1.0.0',
-        },
-        basePath: '/',
-        produces: ['application/json'],
-        schemes: ['http', 'https'],
+  enableSwaggerUI: true,
+  swaggerDefinition: {
+    info: {
+      title: 'Express.js & Socket.io server',
+      description: 'Express.js endpoint API documentation.',
+      version: '1.0.0',
     },
-    basedir: __dirname, //app absolute path
-    files: ['./routes/**/*.js'], //Path to the API handle folder
+    basePath: '/',
+    produces: ['application/json'],
+    schemes: ['http', 'https'],
+  },
+  basedir: __dirname, //app absolute path
+  files: ['./routes/**/*.js'], //Path to the API handle folder
 };
 
 module.exports = {
-    SERVER_PORT,
-    SESSION_SECRET,
-    CONNECTION_TYPE,
-    DB_USERNAME,
-    DB_PASSWORD,
-    DB_HOST,
-    DB_PORT,
-    DB_NAME,
-    DB_QUERY_PARAMS,
-    HTTPS_ENABLED,
-    PRIVATE_KEY_PATH,
-    CERTIFICATE_PATH,
-    CA_PATH,
-    SWAGGER_SETTINGS,
+  SERVER_PORT,
+  SESSION_SECRET,
+  CONNECTION_TYPE,
+  DB_USERNAME,
+  DB_PASSWORD,
+  DB_HOST,
+  DB_PORT,
+  DB_NAME,
+  DB_QUERY_PARAMS,
+  HTTPS_ENABLED,
+  PRIVATE_KEY_PATH,
+  CERTIFICATE_PATH,
+  CA_PATH,
+  SWAGGER_SETTINGS,
 };
